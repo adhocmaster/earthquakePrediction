@@ -20,17 +20,19 @@ class DataFilter:
         )
     
     
+    def loadCSVFromHDD(self, filename):
+        location = self.destFolderHDD + filename
+        return pd.read_csv(location, dtype = {'acoustic_data': np.int16, 'time_to_failure':np.float64 } )
+    
     def getPositionalDataInNP( self, df, start, step ):
         return df[start::step].values
     
     
-    def getPositionalDataFromChunks( self, chunks:pd.DataFrame, start, step ):
+    def getPositionalDataFromChunks( self, chunks:pd.DataFrame, start, step, ignore_index = True ):
         """Assumes that positions are preserved across chunks"""
         data = pd.DataFrame()
         for chunk in chunks:
-            data = data.append( chunk[start::step] )
-            #print( 'chunk shape' + str( chunk.shape ) )
-            #print( 'current shape' + str( data.shape ) )
+            data = data.append( chunk[start::step], ignore_index = ignore_index )
         return data
     
             
@@ -48,8 +50,8 @@ class DataFilter:
         pass
     
     
-    def savePositionalDFFromChunks( self, chunks:pd.DataFrame, start, step ):
-        df = self.getPositionalDataFromChunks(chunks, start, step)
+    def savePositionalDFFromChunks( self, chunks:pd.DataFrame, start, step, ignore_index = True  ):
+        df = self.getPositionalDataFromChunks(chunks, start, step, ignore_index)
         filename = 'every_' + str(step) + '_from_' + str(start) + '.csv'
         self.saveDF(df, filename)
         pass
