@@ -4,10 +4,17 @@ import pandas as pd
 class DataFilter:
     
     def __init__(self):
+        """
         self.sourceSSD = 'C:/earthquake/train.csv'
         self.sourceHDD = 'F:/myProjects/cmps242/earthquake/data/train.csv'
         self.destFolderSSD = 'C:/earthquake/'
         self.destFolderHDD = 'F:/myProjects/cmps242/earthquake/data/'
+        """
+        
+        self.sourceSSD = '/home/exx/muktadir/data/train.csv'
+        self.sourceHDD = '/home/exx/muktadir/data/train.csv'
+        self.destFolderSSD = '/home/exx/muktadir/data/'
+        self.destFolderHDD = '/home/exx/muktadir/data/'
         pass
     
     
@@ -45,13 +52,15 @@ class DataFilter:
         return np.array(dataList)
     
     
-    def saveDF(self, df, filename):
-        df.to_csv( self.destFolderHDD + filename )
+    def saveDF(self, df, filename, index = False):
+        df.to_csv( self.destFolderHDD + filename, index = index, chunksize = 10000 )
         pass
     
     
-    def savePositionalDFFromChunks( self, chunks:pd.DataFrame, start, step, ignore_index = True  ):
+    def savePositionalDFFromChunks( self, chunks:pd.DataFrame, start, step, ignore_index = True, rename=True  ):
         df = self.getPositionalDataFromChunks(chunks, start, step, ignore_index)
+        if rename:
+            df.columns = ['acoustic', 'ttf']
         filename = 'every_' + str(step) + '_from_' + str(start) + '.csv'
         self.saveDF(df, filename)
         pass
