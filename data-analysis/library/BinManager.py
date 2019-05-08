@@ -31,7 +31,7 @@ class BinManager:
         
         pass
     
-    def createRawBinsFromDf(self, df, stopAfter = 0, addBinNoToDf = False):
+    def createRawBinsFromDf(self, df, stopAfter = 0, addBinNoToDf = False, dontSaveToDisk = False):
         
         if addBinNoToDf is True:
             df['binNo'] = np.zeros(len(df), dtype=np.int32)
@@ -54,19 +54,25 @@ class BinManager:
             self.addBinStats(nextBin)
             
             # 4. save bin    
-            self.saveRawBin(nextBin)   
+            if dontSaveToDisk is False:
+                self.saveRawBin(nextBin)  
+                if (nextId % 10000) == 0:
+                    print( f'saved {nextId}th raw bin' ) 
+            elif (nextId % 10000) == 0:
+                    print( f'processed {nextId}th raw bin' ) 
             
             # 5. augment df?
             if addBinNoToDf is True:
-                self.addBinNoToDf(nextBinDf, nextId)
+                self.addBinNoToDf(df, nextBinDf, nextId)
             
-            if (nextId % 10000) == 0:
-                print( f'saved {nextId}th raw bin' )
             
             # 6. next
             nextBinDf, index = self.getNextBinDf(df, index)
-            
-        print(f'saved {nextId} bins to {self.rawBinFolder} folder')
+         
+        if dontSaveToDisk is False:   
+            print(f'saved {nextId} bins to {self.rawBinFolder} folder')
+        else:
+            print(f'Processed {nextId} bins, but not saved.')
         
         pass        
     
@@ -100,13 +106,13 @@ class BinManager:
         pass
     
     
-    def addBinNoToDf(self, nextBinDf, nextId):
+    def addBinNoToDf(self, df, nextBinDf, nextId):
         
-        print( nextBinDf.head(5) )
+        #print( nextBinDf.head(5) )
         
         for row in nextBinDf.itertuples(index = True):
             #print(f'adding binId {nextId} to row {row.Index}')
-            nextBinDf.loc[row.Index]['binNo'] = nextId
+            df.loc[row.Index]['binNo'] = nextId
             
         pass
         
