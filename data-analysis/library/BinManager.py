@@ -85,7 +85,7 @@ class BinManager:
         
         quakeIndex = -1
         for i in range(1, len(data)):
-            if nextBinDf.time_to_failure[i-1] - nextBinDf.time_to_failure[i] < -0.001:
+            if nextBinDf.time_to_failure.iloc[i-1] - nextBinDf.time_to_failure.iloc[i] < -0.001:
                 #negative value means ttf jumped. #todo confirm that this is correct. It can be incorrect.
                 quakeIndex = i-1
                 break
