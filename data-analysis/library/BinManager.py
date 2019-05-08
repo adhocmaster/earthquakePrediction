@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import collections
-import logging, dill
+import logging, dill, fnmatch, os
 from .Bin import Bin
 
 class BinManager:
@@ -120,6 +120,19 @@ class BinManager:
             out = dill.load(f)
         
         return out
+    
+    def countRawBin(self, fname):
+        
+        #return len(fnmatch.filter(os.listdir(self.rawBinFolder), '*.dill'))
+        return len(os.listdir(self.rawBinFolder))
+    
+    def readRawBins(self, fromId, size):
+        
+        bins = []
+        for i in range(size):
+            bins.append( self.readRawBinById(fromId + i) )
+        
+        return bins
         
         
         
