@@ -76,7 +76,7 @@ class BinManager:
         
         data = nextBinDf.acoustic_data.values
         ttf = nextBinDf.iloc[-1].time_to_failure
-        
+                
         return Bin(binId = nextId, ttf = ttf, data = data, quakeIndex = quakeIndex)
                     
         
