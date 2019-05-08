@@ -26,10 +26,20 @@ class BinManager:
         self.rawBinPrefix = 'r_'
         self.rawBinFolder = self.destFolderHDD + 'raw-bins/'
         
+        self.curStatId = 0
+        self.stats = {}
+        
         pass
     
-    def createRawBinsFromDf(self, df, stopAfter = 0):
+    def createRawBinsFromDf(self, df, stopAfter = 0, addBinNoToDf = False):
         
+        if addBinNoToDf is True:
+            df['binNo'] = np.zeros(len(df), dtype=np.int32)
+        
+        # 1. init stats
+        self.initStatsForCurrentDf(df)
+        
+        # 2. Loop over bins
         nextId = 0
         index = -1
         nextBinDf, index = self.getNextBinDf(df, index)
@@ -39,12 +49,21 @@ class BinManager:
         
             nextId = nextId + 1
             nextBin = self.convertDfIntoBinTuple(nextId, nextBinDf)
-
+            
+            # 3. create bin stats
+            self.addBinStats(nextBin)
+            
+            # 4. save bin    
             self.saveRawBin(nextBin)   
+            
+            # 5. augment df?
+            if addBinNoToDf is True:
+                self.addBinNoToDf(nextBinDf, nextId)
             
             if (nextId % 10000) == 0:
                 print( f'saved {nextId}th raw bin' )
             
+            # 6. next
             nextBinDf, index = self.getNextBinDf(df, index)
             
         print(f'saved {nextId} bins to {self.rawBinFolder} folder')
@@ -52,6 +71,46 @@ class BinManager:
         pass        
     
     
+    def initStatsForCurrentDf(self, df):
+        
+        self.curStatId = len(df)
+        self.stats[self.curStatId] = {}
+        self.stats[self.curStatId]["earthquakeBinIds"] = []
+        self.stats[self.curStatId]["sizeFrequencies"] = {}
+        self.stats[self.curStatId]["binIdsBySize"] = {}
+        
+        pass
+    
+    
+        
+    def addBinStats(self, nextBin):
+        
+        sizeFrequencies = self.stats[self.curStatId]["sizeFrequencies"]
+        binIdsBySize = self.stats[self.curStatId]["binIdsBySize"] 
+        
+        sizeKey = len(nextBin.data)
+        
+        if sizeKey not in sizeFrequencies:
+            sizeFrequencies[sizeKey] = 0
+            binIdsBySize[sizeKey] = []
+        
+        sizeFrequencies[sizeKey] = sizeFrequencies[sizeKey] + 1
+        binIdsBySize[sizeKey].append(nextBin.binId)
+            
+        pass
+    
+    
+    def addBinNoToDf(self, nextBinDf, nextId):
+        
+        print( nextBinDf.head(5) )
+        
+        for row in nextBinDf.itertuples(index = True):
+            #print(f'adding binId {nextId} to row {row.Index}')
+            nextBinDf.loc[row.Index]['binNo'] = nextId
+            
+        pass
+        
+        
     def getNextBinDf(self, df, lastIndex = -1):
         """
         index is the end point of the last bin
@@ -60,7 +119,7 @@ class BinManager:
         start = lastIndex + 1
         
         if start >= df.shape[0]:
-            return pd.Dataframe(), lastIndex
+            return pd.DataFrame(), lastIndex
         
         end = start + 4094
         
@@ -78,6 +137,7 @@ class BinManager:
         
         return df[start:end+1], end
     
+    
     def convertDfIntoBinTuple(self, nextId, nextBinDf):
         
         data = nextBinDf.acoustic_data.values
@@ -88,6 +148,8 @@ class BinManager:
             if nextBinDf.time_to_failure.iloc[i-1] - nextBinDf.time_to_failure.iloc[i] < -0.001:
                 #negative value means ttf jumped. #todo confirm that this is correct. It can be incorrect.
                 quakeIndex = i-1
+                self.stats[self.curStatId]["earthquakeBinIds"].append( quakeIndex )
+                print( f'bin {nextId} has a quake at index {quakeIndex}' )
                 break
         
         return Bin(binId = nextId, ttf = ttf, data = data, quakeIndex = quakeIndex)
