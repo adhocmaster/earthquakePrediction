@@ -145,6 +145,7 @@ class BinManager:
     
     
     def convertDfIntoBinTuple(self, nextId, nextBinDf):
+        """code smell: does earthquake calculations."""
         
         data = nextBinDf.acoustic_data.values
         ttf = nextBinDf.iloc[-1].time_to_failure
