@@ -3,7 +3,7 @@ import pandas as pd
 import collections
 import logging
 
-Bin = collections.namedtuple( 'Bin', 'id ttf data quakeIndex' ) #quakeIndex -1 means no quake in this bin
+Bin = collections.namedtuple( 'Bin', 'binId ttf data quakeIndex' ) #quakeIndex -1 means no quake in this bin
 
 class BinManager:
     
@@ -71,6 +71,13 @@ class BinManager:
             end = end + 1
         
         return df[start:end+1]
+    
+    def convertDfIntoBinTuple(self, nextId, nextBinDf):
+        
+        data = nextBinDf.acoustic_data.values
+        ttf = nextBinDf.iloc[-1].time_to_failure
+        
+        return Bin(binId = nextId, ttf = ttf, data = data, quakeIndex = quakeIndex)
                     
         
         
