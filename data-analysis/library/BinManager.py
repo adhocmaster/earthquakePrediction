@@ -34,7 +34,8 @@ class BinManager:
         index = -1
         nextBinDf, index = self.getNextBinDf(df, index)
         
-        while (False != nextBinDf) and (nextId <= stopAfter or stopAfter == 0):
+        print( f"last index: {index} and number records in nextdf { nextBinDf.shape[0] } {nextBinDf.empty is False}" )
+        while ( (nextBinDf.empty is False ) and (nextId <= stopAfter or stopAfter == 0) ):
         
             nextId = nextId + 1
             nextBin = self.convertDfIntoBinTuple(nextId, nextBinDf)
@@ -45,6 +46,8 @@ class BinManager:
                 print( f'saved {nextId}th raw bin' )
             
             nextBinDf, index = self.getNextBinDf(df, index)
+            
+        print(f'saved {nextId} bins to {self.rawBinFolder} folder')
         
         pass        
     
@@ -57,7 +60,7 @@ class BinManager:
         start = lastIndex + 1
         
         if start >= df.shape[0]:
-            return
+            return pd.Dataframe(), lastIndex
         
         end = start + 4094
         
@@ -73,7 +76,7 @@ class BinManager:
 
             end = end + 1
         
-        return df[start:end+1]
+        return df[start:end+1], end
     
     def convertDfIntoBinTuple(self, nextId, nextBinDf):
         
@@ -93,7 +96,6 @@ class BinManager:
     def saveRawBin(self, nextBin):
         
         fname = self.rawBinFolder + self.getRelativeRawFileName(nextBin.binId)
-        print(f"writing {fname}")
         with open(fname, 'wb') as outfile:
             dill.dump(nextBin, outfile)
             
