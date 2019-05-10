@@ -159,7 +159,12 @@ class BinManager:
                 print( f'bin {nextId} has a quake at index {quakeIndex}' )
                 break
         
-        return Bin(binId = nextId, ttf = ttf, data = data, quakeIndex = quakeIndex)
+        return Bin(binId = nextId, 
+                   ttf = ttf, 
+                   data = data, 
+                   quakeIndex = quakeIndex,
+                   trIndexStart = nextBinDf.index[0]
+                  )
     
     
     def saveRawBin(self, nextBin):
@@ -202,6 +207,8 @@ class BinManager:
             bins.append( self.readRawBinById(fromId + i) )
         
         return bins
+    
+    
         
         
         
