@@ -9,4 +9,4 @@ from .BinIO import BinIO
 class BinJoiner:
     
     def __init__(self):
-        
+        pass
