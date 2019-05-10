@@ -56,9 +56,9 @@ class BinManager:
             # 4. save bin    
             if dontSaveToDisk is False:
                 self.saveRawBin(nextBin)  
-                if (nextId % 10000) == 0:
+                if (nextId % 2000) == 0:
                     print( f'saved {nextId}th raw bin' ) 
-            elif (nextId % 10000) == 0:
+            elif (nextId % 2000) == 0:
                     print( f'processed {nextId}th raw bin' ) 
             
             # 5. augment df?
@@ -127,7 +127,7 @@ class BinManager:
         if start >= df.shape[0]:
             return pd.DataFrame(), lastIndex
         
-        end = start + 4094
+        end = start + 4090
         
         while (end < df.shape[0]):
             
@@ -155,7 +155,7 @@ class BinManager:
             if nextBinDf.time_to_failure.iloc[i-1] - nextBinDf.time_to_failure.iloc[i] < -0.001:
                 #negative value means ttf jumped. #todo confirm that this is correct. It can be incorrect.
                 quakeIndex = i-1
-                self.stats[self.curStatId]["earthquakeBinIds"].append( quakeIndex )
+                self.stats[self.curStatId]["earthquakeBinIds"].append( nextId )
                 print( f'bin {nextId} has a quake at index {quakeIndex}' )
                 break
         
