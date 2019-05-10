@@ -23,6 +23,8 @@ class BinTransformer:
     # For positive bins
     def createPositiveBins(self, fromId = 1, toId = 0 ):
         
+        """ It makes all the acoustic data from raw bins positive """
+        
         if toId == 0:
             toId = self.numRawBins 
         
