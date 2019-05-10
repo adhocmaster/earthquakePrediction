@@ -26,7 +26,7 @@ class BinProcessor:
         return dic
     
     
-    def makeAllPositive(self, aBin):
+    def makeDataPositive(self, aBin):
         
         data = np.abs(aBin.data)
         return Bin(binId = aBin.binId, 
