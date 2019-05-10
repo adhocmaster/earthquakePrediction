@@ -3,6 +3,7 @@ import logging, dill, fnmatch, os
 from .Bin import Bin
 from .BinManager import BinManager
 from .BinProcessor import BinProcessor
+from .BinIO import BinIO
 
 class BinTransformer:
     
@@ -10,14 +11,11 @@ class BinTransformer:
         
         self.binManager = BinManager()
         self.binProcessor = BinProcessor()
+        self.binIO = BinIO()
         
         self.numRawBins = 153584
         
-        self.destFolderSSD = self.binManager.destFolderSSD
-        self.destFolderHDD = self.binManager.destFolderHDD
-        
-        self.positiveBinPrefix = 'p_'
-        self.positiveBinFolder = self.destFolderHDD + 'positive-bins/'
+        self.positiveBinType = 'pos'
                 
         pass
     
@@ -32,48 +30,23 @@ class BinTransformer:
             if (binId % 2000) == 0:
                 print( f'processed {binId}th positive bin' ) 
             positiveBin = self.binProcessor.makeDataPositive( self.binManager.readRawBinById(binId) )
-            self.savePositiveBin( positiveBin )
+            self.binIO.saveBin( positiveBin, self.positiveBinType )
         
         pass
     
-    
-    def savePositiveBin(self, positiveBin):
-        
-        fname = self.positiveBinFolder + self.getRelativePositiveFileName(positiveBin.binId)
-        with open(fname, 'wb') as outfile:
-            dill.dump(positiveBin, outfile)
-            
-        pass
-    
-    
-    def getRelativePositiveFileName(self, binId):
-        return self.positiveBinPrefix + 'bin_' + str( binId ) + '.dill'
-        
     
     def readPositiveBinById(self, binId):
         
-        fname = self.positiveBinFolder + self.getRelativePositiveFileName(binId)
-        return self.readPositiveBin(fname)
+        return self.binIO.readBinById(binId, self.positiveBinType)
     
-        
-    def readPositiveBin(self, fname):
-        
-        with open(fname, 'rb') as f:
-            out = dill.load(f)
-        
-        return out
     
-    def countPositiveBin(self, fname):
+    def countPositiveBin(self):
         
-        return len(os.listdir(self.positiveBinFolder))
+        return self.binIO.countBin(self.positiveBinType)
     
     def readPositiveBins(self, fromId, size):
         
-        bins = []
-        for i in range(size):
-            bins.append( self.readPositiveBinById(fromId + i) )
-        
-        return bins
+        return self.binIO.readBins(fromId, size, self.positiveBinType)
             
             
         

@@ -24,7 +24,7 @@ class BinManager:
         self.destFolderHDD = '/home/exx/muktadir/data/'
         
         self.rawBinPrefix = 'r_'
-        self.rawBinFolder = self.destFolderHDD + 'raw-bins/'
+        self.rawBinFolder = self.destFolderHDD + 'r-bins/'
         
         self.curStatId = 0
         self.stats = {}
