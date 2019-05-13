@@ -4,7 +4,7 @@
 import numpy as np
 import keras
 
-class DataGenerator(keras.utils.Sequence):
+class RegressionDataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
     def __init__(self, list_IDs, batch_size=32, dim=(32,32,32), n_channels=1, shuffle=True):
         'Initialization'
