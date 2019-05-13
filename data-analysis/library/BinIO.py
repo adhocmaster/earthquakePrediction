@@ -25,7 +25,7 @@ class BinIO:
     def saveBin(self, aBin, binType):
         
         fname = self.getBinFileName(aBin.binId, binType)
-        print( fname)
+        # print( fname)
         with open(fname, 'wb') as outfile:
             dill.dump(aBin, outfile)
             
