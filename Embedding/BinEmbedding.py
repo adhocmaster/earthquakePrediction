@@ -2,7 +2,7 @@ import numpy as np
 import logging
 from data_analysis.library.Bin import Bin
 from data_analysis.library.BinProcessor import BinProcessor
-from library.Embedding import Embedding
+from Embedding.Embedding import Embedding
 
 class BinEmbedding(Embedding):
     
