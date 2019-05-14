@@ -1,20 +1,18 @@
 import numpy as np
 import logging
 from data_analysis.library.Bin import Bin
-from data_analysis.library.BinProcessor import BinProcessor
-from Embedding.Embedding import Embedding
+from embedding.Embedding import Embedding
 
 class BinEmbedding(Embedding):
     
     def __init__(self, binSize = 4096 ):
         
-        self.binProcessor = BinProcessor()
-
-        self.binSize = 4096
+        self.binSize = binSize
         self.rowDim = 64
         self.colDim = int( self.binSize / self.rowDim )
         
         if self.binSize % self.rowDim != 0:
+            logging.error(f"{binSize} is not divisible by {self.rowDim}")
             raise Exception(f"{binSize} is not divisible by {self.rowDim}")
         pass
     
