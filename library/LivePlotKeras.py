@@ -2,6 +2,9 @@ import keras
 from matplotlib import pyplot as plt
 from IPython.display import clear_output
 
+import seaborn as sns
+sns.set(style="darkgrid")
+
 class LivePlotKeras(keras.callbacks.Callback):
     def on_train_begin(self, logs={}):
         self.i = 0
@@ -22,6 +25,7 @@ class LivePlotKeras(keras.callbacks.Callback):
         self.i += 1
         
         clear_output(wait=True)
+        self.fig = plt.figure(figsize=(20, 10))
         plt.plot(self.x, self.losses, label="train")
         plt.plot(self.x, self.val_losses, label="validation")
         plt.legend()
