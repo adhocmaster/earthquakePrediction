@@ -1,11 +1,11 @@
 import numpy as np
-import logging, dill, fnmatch, os
+import logging, dill
 from .Bin import Bin
 from .BinManager import BinManager
 from .BinProcessor import BinProcessor
 from .BinIO import BinIO
 
-class BinTransformer:
+class PositiveBinManager:
     
     def __init__(self):
         

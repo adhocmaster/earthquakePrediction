@@ -39,4 +39,3 @@ class EarthQuakeDataGenerator(RegressionDataGenerator):
         return X, y
     
     
-}

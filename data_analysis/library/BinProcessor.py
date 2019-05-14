@@ -29,9 +29,12 @@ class BinProcessor:
     def makeDataPositive(self, aBin):
         
         data = np.abs(aBin.data)
+        return self.updateData(aBin, data)
+    
+    def updateData(self, aBin, newData):
         return Bin(binId = aBin.binId, 
                    ttf = aBin.ttf, 
-                   data = data, 
+                   data = newData, 
                    quakeIndex = aBin.quakeIndex,
                    trIndexStart = aBin.trIndexStart
                   )
