@@ -3,35 +3,53 @@ import pandas as pd
 import collections
 import logging, dill, fnmatch, os
 from .Bin import Bin
+from .BinIO import BinIO
+from sklearn import preprocessing
+from .Scalers import Scalers
 
 class RawBinManager:
 
-    def __init__(self):
+    def __init__(self, binType = 'r', makePositive = False, normalize = False, scale=False ):
 
-        """
-        self.sourceSSD = 'C:/earthquake/train.csv'
-        self.sourceHDD = 'F:/myProjects/cmps242/earthquake/data/train.csv'
-        self.destFolderSSD = 'C:/earthquake/'
-        self.destFolderHDD = 'F:/myProjects/cmps242/earthquake/data/'
-        """
-        self.sourceSSD = 'C:/earthquake/train.csv'
-        self.sourceHDD = 'F:/myProjects/cmps242/earthquake/data/train.csv'
-        self.destFolderSSD = 'C:/earthquake/'
-        self.destFolderHDD = 'F:/myProjects/cmps242/earthquake/data/'
-        self.sourceSSD = '/home/exx/muktadir/data/train.csv'
-        self.sourceHDD = '/home/exx/muktadir/data/train.csv'
-        self.destFolderSSD = '/home/exx/muktadir/data/'
-        self.destFolderHDD = '/home/exx/muktadir/data/'
-
-        self.rawBinPrefix = 'r_'
-        self.rawBinFolder = self.destFolderHDD + 'r-bins/'
+        self.binIO = BinIO()
+        self.scalers = Scalers()
+        self.binType = binType
+        # self.rawBinPrefix = binType + '_'
+        # self.rawBinFolder = self.destFolderHDD + binType + '-bins/'
 
         self.curStatId = 0
         self.stats = {}
+        self.makePositive = makePositive
+        self.normalize = normalize
+        self.scale = scale
+
+        self.scaler = None
+        self.normalizer = None
 
         pass
 
-    def createRawBinsFromDf(self, df, stopAfter = 0, addBinNoToDf = False, dontSaveToDisk = False):
+    def createRawBinsFromDf(self, df, stopAfter = 0, addBinNoToDf = False, dontSaveRawToDisk = False):
+
+        if self.makePositive:
+            df.acoustic_data = np.abs(df.acoustic_data)
+            reshapedAcousticDataForPreprocessing = df.acoustic_data.values.reshape(-1, 1)
+            if self.normalize:
+                df['norm'] = self.scalers.getScaler('absNormalizer').transform(reshapedAcousticDataForPreprocessing)
+                logging.warning('abs normalized df')
+
+            if self.scale:
+                df['scaled'] = self.scalers.getScaler('absScaler').transform(reshapedAcousticDataForPreprocessing)
+                logging.warning('abs scaled df')
+        else:
+            reshapedAcousticDataForPreprocessing = df.acoustic_data.values.reshape(-1, 1)
+            if self.normalize:
+                df['norm'] = self.scalers.getScaler('normalizer').transform(reshapedAcousticDataForPreprocessing)
+                logging.warning('normalized df')
+
+            if self.scale:
+                df['scaled'] = self.scalers.getScaler('scaler').transform(reshapedAcousticDataForPreprocessing)
+                logging.warning('scaled df')
+
 
         if addBinNoToDf is True:
             df['binNo'] = np.zeros(len(df), dtype=np.int32)
@@ -49,17 +67,21 @@ class RawBinManager:
 
             nextId = nextId + 1
             nextBin = self.convertDfIntoBinTuple(nextId, nextBinDf)
+            if (nextId % 2000) == 0:
+                    print( f'processed {nextId}th raw bin' )
 
             # 3. create bin stats
             self.addBinStats(nextBin)
 
-            # 4. save bin
-            if dontSaveToDisk is False:
-                self.saveRawBin(nextBin)
-                if (nextId % 2000) == 0:
-                    print( f'saved {nextId}th raw bin' )
-            elif (nextId % 2000) == 0:
-                    print( f'processed {nextId}th raw bin' )
+            # 4. save bins
+            if dontSaveRawToDisk is False:
+                self.saveRawBin(nextBin, self.binType)
+
+            if self.normalize:
+                self.saveRawBin(self.getNormalBin(nextBin, nextBinDf), self.binType + 'nor')
+
+            if self.scale:
+                self.saveRawBin(self.getScaledBin(nextBin, nextBinDf), self.binType + 'scaled')
 
             # 5. augment df?
             if addBinNoToDf is True:
@@ -69,7 +91,7 @@ class RawBinManager:
             # 6. next
             nextBinDf, index = self.getNextBinDf(df, index)
 
-        if dontSaveToDisk is False:
+        if dontSaveRawToDisk is False:
             print(f'saved {nextId} bins to {self.rawBinFolder} folder')
         else:
             print(f'Processed {nextId} bins, but not saved.')
@@ -127,7 +149,7 @@ class RawBinManager:
         if start >= df.shape[0]:
             return pd.DataFrame(), lastIndex
 
-        end = start + 4090
+        end = start + 4094
 
         while (end < df.shape[0]):
 
@@ -166,44 +188,33 @@ class RawBinManager:
                    trIndexStart = nextBinDf.index[0]
                   )
 
+    def getNormalBin(self, rawBin, rawBinDf):
+        return Bin(binId = rawBin.binId,
+                   ttf = rawBin.ttf,
+                   data = rawBinDf.norm.values,
+                   quakeIndex = rawBin.quakeIndex,
+                   trIndexStart = rawBin.trIndexStart
+                  )
 
-    def saveRawBin(self, nextBin):
+    def getScaledBin(self, rawBin, rawBinDf):
+        return Bin(binId = rawBin.binId,
+             ttf = rawBin.ttf,
+             data = rawBinDf.scaled.values,
+             quakeIndex = rawBin.quakeIndex,
+             trIndexStart = rawBin.trIndexStart
+            )
 
-        fname = self.rawBinFolder + self.getRelativeRawFileName(nextBin.binId)
-        with open(fname, 'wb') as outfile:
-            dill.dump(nextBin, outfile)
 
+    def saveRawBin(self, nextBin, binType ):
+        self.binIO.saveBin( nextBin, binType )
         pass
 
 
-
-    def getRelativeRawFileName(self, binId):
-        return self.rawBinPrefix + 'bin_' + str( binId ) + '.dill'
-
-
-
-    def readRawBinById(self, binId):
-
-        fname = self.rawBinFolder + self.getRelativeRawFileName(binId)
-        return self.readRawBin(fname)
-
-
-    def readRawBin(self, fname):
-
-        with open(fname, 'rb') as f:
-            out = dill.load(f)
-
-        return out
+    def readRawBinById(self, binIdn, binType):
+        return self.binIO.readBinById(binId, binType)
 
     def countRawBin(self, fname):
-
-        #return len(fnmatch.filter(os.listdir(self.rawBinFolder), '*.dill'))
-        return len(os.listdir(self.rawBinFolder))
+        return self.binIO.countBin(self.binType)
 
     def readRawBins(self, fromId, size):
-
-        bins = []
-        for i in range(size):
-            bins.append( self.readRawBinById(fromId + i) )
-
-        return bins
+        return self.binIO.readBins(fromId, size, self.binType)
