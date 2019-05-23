@@ -97,8 +97,8 @@ class Stats:
     def getFirstOrderSeasonalityStatsList(self, x:pd.core.series.Series):
 
         seasonalData = x.diff()
-        embedding = self.getBasicStatsList(seasonalData.values)
-        embedding.extend( self.getTrendStatsList(seasonalData, windows=[5,10, 20]))
+        embedding = self.getBasicStatsList(seasonalData.values) #15
+        embedding.extend( self.getTrendStatsList(seasonalData, windows=[5,10, 20])) # 3 * 27
         return embedding
 
     

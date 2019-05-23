@@ -12,7 +12,7 @@ class OneStatsEmbedding(Embedding):
 
     def __init__(self, scaler = None):
 
-        self.numberOfFeatures = 15 + 6 * 27 + 2 + 3 * 27
+        self.numberOfFeatures = 15 + 6 * 27 + 2 + 15 + 3 * 27
         self.scaler = scaler
         self.stats = Stats()
         super(OneStatsEmbedding, self).__init__(sourceCardinality = SourceCardinality.MULTI)
@@ -27,18 +27,23 @@ class OneStatsEmbedding(Embedding):
             data.extend(aBin.data)
             ttfs.append(aBin.ttf)
         
+        data = np.array(data).reshape(-1, 1)
+
         if self.scaler is not None:
             data = self.scaler.transform( data )
         # 2. conduct stats on the data
 
-        embedding = self.stats.getBasicStatsList(data) #15 #maybe this function should use series
-        dataSeries = pd.Series(data)
-        embedding.extend(self.stats.getTrendStatsList(dataSeries)) # 6 * 27
-        embedding.extend(self.stats.getLinearSeasonalityStatsList(data, True)) # 2
-        embedding.extend(self.stats.getFirstOrderSeasonalityStatsList(dataSeries)) # 3 * 27
-        # embedding.extend(self.stats.getTTFDiffStatsList(ttfs)) # 15
+        with np.errstate(invalid='ignore'):
+            embedding = self.stats.getBasicStatsList(data) #15 #maybe this function should use series
+            dataSeries = pd.Series(data.flatten())
+            embedding.extend(self.stats.getTrendStatsList(dataSeries)) # 6 * 27
+            embedding.extend(self.stats.getLinearSeasonalityStatsList(data, True)) # 2
+            embedding.extend(self.stats.getFirstOrderSeasonalityStatsList(dataSeries)) # 3 * 27
+            # embedding.extend(self.stats.getTTFDiffStatsList(ttfs)) # 15
+
+        #print (f"embedding length: {len(embedding)}" )
 
         # 3. return stats
-        return np.array(embedding)
+        return np.array(embedding).reshape(-1, 1)
 
     

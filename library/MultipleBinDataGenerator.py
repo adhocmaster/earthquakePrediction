@@ -66,12 +66,16 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
         X = np.empty((self.batch_size, *self.dim, self.n_channels))
         y = np.empty(self.batch_size)
 
+        #print( X.shape )
+        #print(self.dim)
+
         sampleStartId = batchIndex * self.batch_size * self.stride + 1
 
         for i in range( self.batch_size ):
             X[i,], y[i] = self.getEmbeddingAndOutput(sampleStartId)
             sampleStartId += self.stride
 
+        print(X.shape)
         return X, y
 
 
@@ -89,6 +93,8 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
 
         # Generate data
         features = self.embedder.fromBins(bins)
+
+        #print(features.shape)
 
         return features, lastBin.ttf
 
