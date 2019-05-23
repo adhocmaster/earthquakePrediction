@@ -39,7 +39,7 @@ class RegressionDataGenerator(keras.utils.Sequence):
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
 
-        gc.collect()
+        gc.collect() # TODO do it in another thread
         pass
 
     def data_generation(self, list_IDs_temp):
