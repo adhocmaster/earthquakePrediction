@@ -4,7 +4,8 @@ import logging, dill
 
 class Scalers:
     def __init__(self):
-        self.scalerFolder = '/home/exx/muktadir/earthquakePrediction/scalers/'
+        #self.scalerFolder = '/home/exx/muktadir/earthquakePrediction/scalers/'
+        self.scalerFolder = './scalers/'
         pass
 
     def createScalers(self, df):
