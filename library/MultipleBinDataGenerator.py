@@ -152,10 +152,11 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
             self.embeddingIO.save(embeddingCache, 'one-stats')
 
             if embeddingId % 1000 == 0:
-                logging.debug(f"cached {embeddingId}")
+                logging.debug(f"cached {embeddingId} now collecting garbage")
+                gc.collect()  # TODO do it in another thread
             startBinId += self.stride
             embeddingId += 1
-            gc.collect()  # TODO do it in another thread
+            
 
 
 
