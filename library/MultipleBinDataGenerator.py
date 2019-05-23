@@ -85,7 +85,7 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
                 embeddingId += 1
 
         except Exception as e:
-            
+
             logging.warning(f"Batch exception{e}")
 
         #print(X.shape)
@@ -150,6 +150,9 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
                                             features = features,
                                             ttf = ttf)
             self.embeddingIO.save(embeddingCache, 'one-stats')
+
+            if embeddingId % 1000 == 0:
+                logging.debug(f"cached {embeddingId}")
             startBinId += self.stride
             embeddingId += 1
 
