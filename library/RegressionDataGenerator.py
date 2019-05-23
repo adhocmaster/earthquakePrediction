@@ -2,7 +2,7 @@
 # Author: adhocmaster
 
 import numpy as np
-import keras
+import keras, gc
 
 class RegressionDataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
@@ -38,6 +38,9 @@ class RegressionDataGenerator(keras.utils.Sequence):
         self.indexes = np.arange(len(self.list_IDs))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
+
+        gc.collect()
+        pass
 
     def data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)

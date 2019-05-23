@@ -1,5 +1,5 @@
 import numpy as np
-import logging, dill, fnmatch, os, math
+import logging, dill, fnmatch, os, math, gc
 from data_analysis.library.Bin import Bin
 from data_analysis.library.BinIO import BinIO
 from data_analysis.library.Scalers import Scalers
@@ -137,10 +137,10 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
 
         return features, lastBin.ttf
     
-    def cacheEmbeddingByBatch(self, stopAfter =0):
+    def cacheEmbeddingByBatch(self, startEmbeddingId = 1, stopAfter =0):
         
-        startBinId = 1
-        embeddingId = 1
+        embeddingId = startEmbeddingId
+        startBinId = (embeddingId-1) * self.stride + 1
 
         while startBinId + self.stride <= self.numBins and ( stopAfter == 0 or stopAfter >= startBinId ):
             features, ttf = self.getEmbeddingAndOutput(startBinId)
@@ -155,6 +155,7 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
                 logging.debug(f"cached {embeddingId}")
             startBinId += self.stride
             embeddingId += 1
+            gc.collect()
 
 
 
