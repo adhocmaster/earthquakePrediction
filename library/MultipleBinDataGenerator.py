@@ -155,7 +155,7 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
                 logging.debug(f"cached {embeddingId}")
             startBinId += self.stride
             embeddingId += 1
-            gc.collect()
+            gc.collect()  # TODO do it in another thread
 
 
 
