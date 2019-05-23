@@ -44,6 +44,6 @@ class OneStatsEmbedding(Embedding):
         #print (f"embedding length: {len(embedding)}" )
 
         # 3. return stats
-        return np.array(embedding).reshape(-1, 1)
+        return np.array(embedding)
 
     

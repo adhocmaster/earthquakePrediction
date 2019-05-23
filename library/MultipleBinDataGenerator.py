@@ -6,6 +6,8 @@ from data_analysis.library.Scalers import Scalers
 from library.RegressionDataGenerator import RegressionDataGenerator
 from embedding.OneStatsEmbedding import *
 from embedding.MultipleBinEmbeddingType import *
+from embedding.EmbeddingCache import EmbeddingCache
+from embedding.EmbeddingIO import EmbeddingIO
 
 class MultipleBinDataGenerator(RegressionDataGenerator): 
     
@@ -20,18 +22,21 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
         self.windowSize = windowSize
         self.stride = stride
 
+        self.lastWindowBins = {}
+
         # Make IDs here.
         if list_IDs is None:
             list_IDs = self.getListIds()
 
         self.embedder = self.getEmbedder()
+        self.embeddingIO = EmbeddingIO()
 
         if self.stride > self.windowSize:
             logging.warning( f"stride is greater than windowSize" )
 
         logging.warning(f"shuffling: {shuffle}")
     
-        super(MultipleBinDataGenerator, self).__init__(list_IDs, batch_size, dim=(self.embedder.numberOfFeatures,), shuffle = shuffle)
+        super(MultipleBinDataGenerator, self).__init__(list_IDs, batch_size, dim=(self.embedder.numberOfFeatures), shuffle = shuffle)
 
         pass
 
@@ -63,7 +68,34 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
 
         'Generate one batch of data'
 
-        X = np.empty((self.batch_size, *self.dim, self.n_channels))
+        X = np.empty((self.batch_size, self.dim))
+        y = np.empty(self.batch_size)
+
+        #print( X.shape )
+        #print(self.dim)
+
+        embeddingId = batchIndex * self.batch_size + 1
+
+        try:
+
+            for i in range( self.batch_size ):
+                embeddingCache = self.embeddingIO.readById(embeddingId, 'one-stats')
+                X[i,] = embeddingCache.features
+                y[i] = embeddingCache.ttf
+                embeddingId += 1
+
+        except Exception as e:
+            
+            logging.warning(f"Batch exception{e}")
+
+        #print(X.shape)
+        return X, y
+
+    def __getitemFromBins__(self, batchIndex):
+
+        'Generate one batch of data'
+
+        X = np.empty((self.batch_size, self.dim))
         y = np.empty(self.batch_size)
 
         #print( X.shape )
@@ -75,21 +107,28 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
             X[i,], y[i] = self.getEmbeddingAndOutput(sampleStartId)
             sampleStartId += self.stride
 
-        print(X.shape)
+        #print(X.shape)
         return X, y
 
 
-    def getEmbeddingAndOutput(self, startBinId ):
+    def getEmbeddingAndOutput(self, startBinId ): #should cache the last window as there will be overlapping bins.
         
         endBinId = startBinId + self.windowSize
         bins = []
         for binId in range( startBinId, endBinId ):
             try:
-                bins.append( self.binIO.readBinById(binId, self.binType) )
+                if binId in self.lastWindowBins:
+                    bins.append(self.lastWindowBins[binId])
+                else:
+                    bins.append(self.binIO.readBinById(binId, self.binType))
             except Exception as e:
                 logging.warning( f"Batch bin exception. Might be safe to continue. {e}")
 
         lastBin = bins[-1]
+        #cache bins
+        self.lastWindowBins = {}
+        for aBin in bins:
+            self.lastWindowBins[aBin.binId] = aBin
 
         # Generate data
         features = self.embedder.fromBins(bins)
@@ -97,6 +136,23 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
         #print(features.shape)
 
         return features, lastBin.ttf
+    
+    def cacheEmbeddingByBatch(self, stopAfter =0):
+        
+        startBinId = 1
+        embeddingId = 1
+
+        while startBinId + self.stride <= self.numBins and ( stopAfter == 0 or stopAfter >= startBinId ):
+            features, ttf = self.getEmbeddingAndOutput(startBinId)
+            embeddingCache = EmbeddingCache(embeddingId = embeddingId,
+                                            firstBinId = startBinId,
+                                            type = str(self.embedding.value) + '-w' + str(self.windowSize) + 's-' + str(self.stride),
+                                            features = features,
+                                            ttf = ttf)
+            self.embeddingIO.save(embeddingCache, 'one-stats')
+            startBinId += self.stride
+            embeddingId += 1
+
 
 
     
