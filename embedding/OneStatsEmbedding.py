@@ -38,7 +38,7 @@ class OneStatsEmbedding(Embedding):
             dataSeries = pd.Series(data.flatten())
             embedding.extend(self.stats.getTrendStatsList(dataSeries)) # 6 * 27
             embedding.extend(self.stats.getLinearSeasonalityStatsList(data, True)) # 2
-            embedding.extend(self.stats.getFirstOrderSeasonalityStatsList(dataSeries)) # 3 * 27
+            embedding.extend(self.stats.getFirstOrderSeasonalityStatsList(dataSeries)) # 15 + 3 * 27
             # embedding.extend(self.stats.getTTFDiffStatsList(ttfs)) # 15
 
         #print (f"embedding length: {len(embedding)}" )

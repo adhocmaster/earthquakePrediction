@@ -10,6 +10,7 @@ class Stats:
 
     def getBasicStatsList(self, data:np.ndarray):
         
+        data = data[np.isfinite(data)]
         scistats = stats.describe( data )   
         embedding = []
         embedding.append(scistats.mean)
@@ -26,7 +27,7 @@ class Stats:
         embedding.append(np.quantile(data, 0.01))
         embedding.append(np.quantile(data, 0.05))
         embedding.append(np.quantile(data, 0.10))
-        embedding.append(scistats.variance/scistats.mean)
+        embedding.append(scistats.variance - scistats.mean)
         # 15 features upto var/mean
         
         return embedding
