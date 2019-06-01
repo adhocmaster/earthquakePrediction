@@ -22,20 +22,28 @@ class OneStatsEmbedding(Embedding):
 
         # 1. get all data & scale it using the scaler
         data = []
-        ttfs = []
+        # ttfs = []
         for aBin in bins:
             data.extend(aBin.data)
-            ttfs.append(aBin.ttf)
+            # ttfs.append(aBin.ttf)
         
+        return self.fromUnnormalizedNumpyData(data)
+    
+    def fromUnnormalizedNumpyData(self, data):
+
         data = np.array(data).reshape(-1, 1)
 
         if self.scaler is not None:
             data = self.scaler.transform( data )
-        # 2. conduct stats on the data
+
+        return self.fromNormalizedNumpyData(data)
+
+    def fromNormalizedNumpyData(self, data ):
 
         with np.errstate(invalid='ignore'):
-            embedding = self.stats.getBasicStatsList(data) #15 #maybe this function should use series
             dataSeries = pd.Series(data.flatten())
+
+            embedding = self.stats.getBasicStatsList(data) #15 #maybe this function should use series
             embedding.extend(self.stats.getTrendStatsList(dataSeries)) # 6 * 27
             embedding.extend(self.stats.getLinearSeasonalityStatsList(data, True)) # 2
             embedding.extend(self.stats.getFirstOrderSeasonalityStatsList(dataSeries)) # 15 + 3 * 27
@@ -45,5 +53,9 @@ class OneStatsEmbedding(Embedding):
 
         # 3. return stats
         return np.array(embedding)
+    
+    def fromUnnormalizedDfData(self, df):
+        
+        return self.fromUnnormalizedNumpyData(df.acoustic_data.values)
 
     
