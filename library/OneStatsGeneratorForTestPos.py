@@ -112,7 +112,7 @@ class OneStatsGeneratorForTestPos:
             yield self.getTestName(path), data
         
     def getTestName(self, path):
-        print(path)
+        # print(path)
         return re.findall(r'.*[\/\\]([a-zA-Z0-9_]+)\.csv$', path)[0]
         
 
