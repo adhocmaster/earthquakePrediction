@@ -12,6 +12,7 @@ class CNNStatsEmbedding(Embedding):
 
         self.type = 'cnn-stats'
         self.scaler = scaler
+        self.binsPerEmbedding = binsPerEmbedding
         self.embedding = OneStatsEmbedding(scaler)
         self.dim = (binsPerEmbedding, self.embedding.numberOfFeatures)
         super(CNNStatsEmbedding, self).__init__(sourceCardinality = SourceCardinality.MULTI)
@@ -27,5 +28,17 @@ class CNNStatsEmbedding(Embedding):
             data.append(binStats)
         
         return np.array(data)
+    
+    def fromBinsDf(self, df):
+        start = 0
+        data = []
+        for _ in range(self.binsPerEmbedding):
+            end = start + 4096
+            binStats = self.embedding.fromUnnormalizedNumpyData(df[start: end])
+            data.append(binStats)
+            start = end
+        
+        return np.array(data)
+
         
         

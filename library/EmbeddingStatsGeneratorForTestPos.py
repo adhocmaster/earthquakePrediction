@@ -56,15 +56,15 @@ class EmbeddingStatsGeneratorForTestPos:
             end = start + 4096 * self.binsPerEmbedding
             binDf = df[start: end]
             # create embedding
-            self.createEmbedddingFromBinDf(binDf)
+            self.createEmbedddingFromBinsDf(binDf)
             start += self.windowSize
 
         pass
 
 
-    def createEmbedddingFromBinDf(self, binDf):
+    def createEmbedddingFromBinsDf(self, binDf):
 
-        features = self.embedder.fromUnnormalizedDfData(binDf)
+        features = self.embedder.fromBinsDf(binDf)
         self.lastEmbeddingId += 1
         embedding = EmbeddingCacheTest(embeddingId=self.lastEmbeddingId, type=self.embeddingType, features = features)
 

@@ -58,5 +58,9 @@ class OneStatsEmbedding(Embedding):
     def fromUnnormalizedDfData(self, df):
         
         return self.fromUnnormalizedNumpyData(df.acoustic_data.values)
+    
+    
+    def fromBinsDf(self, df):
+        return self.fromUnnormalizedDfData(df)
 
     
