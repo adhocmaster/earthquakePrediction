@@ -1,6 +1,6 @@
 from library.TestIO import TestIO
 from os.path import dirname, basename, isfile
-import glob
+import glob, gc
 import pandas as pd
 import numpy as np
 import math, re
@@ -25,20 +25,27 @@ class EmbeddingStatsGeneratorForTestPos:
             self.embedder = CNNStatsEmbedding( self.scalers.getScaler('absScaler'), binsPerEmbedding=binsPerEmbedding ) # positive scaler
         pass
     
-    def generateEmbeddings(self):
+    def generateEmbeddings(self, skipFiles=0):
 
         csvPaths = glob.glob(dirname(self.io.sourceFolder)+"/*.csv")
 
         i = 0
         for path in csvPaths:
-            self.createEmbeddingsFromPath(path)
-            i += 1
             if i % 100 == 0:
+                gc.collect()  # TODO do it in another thread
                 print(f"processed {i} files")
                 print(f"generated {self.lastEmbeddingId} embeddings")
-        
+
+            i += 1
+            
+            if skipFiles > 0 and i < skipFiles:
+                self.lastEmbeddingId += self.numberOfEmbeddingPerFile
+                continue 
+
+            self.createEmbeddingsFromPath(path)
         
         print(f"generated {self.lastEmbeddingId} embeddings")
+        pass
     
     def createEmbeddingsFromPath(self, path):
         df = pd.read_csv(
