@@ -86,12 +86,17 @@ class OneStatsGeneratorForTestPos:
     
     def batches(self, batchSize = 16):
 
-        numBatches = math.ceil(self.numEmbeddings / 16)
+        # numBatches = math.ceil(self.numEmbeddings / 16)
 
-        for i in range(numBatches):
-            yield self.getBatch(i+1, batchSize)
+        # for i in range(numBatches):
+        #     yield self.getBatch(i+1, batchSize)
         
-        pass
+        # pass
+        i = 1
+        while True:
+            data = self.getBatch(i, batchSize)
+            if len(data) == 0:
+                break
         
         
 
