@@ -3,7 +3,7 @@ from os.path import dirname, basename, isfile
 import glob
 import pandas as pd
 import numpy as np
-import math
+import math, re
 from embedding.OneStatsEmbedding import *
 from embedding.EmbeddingCache import EmbeddingCacheTest
 from data_analysis.library.Scalers import Scalers
@@ -92,12 +92,28 @@ class OneStatsGeneratorForTestPos:
         #     yield self.getBatch(i+1, batchSize)
         
         # pass
-        i = 1
+        i = 0
         while True:
+            i = i + 1
             data = self.getBatch(i, batchSize)
             if len(data) == 0:
                 break
+            yield data
+
+    def batchesByFile(self):
+
+        csvPaths = glob.glob(dirname(self.io.sourceFolder)+"/*.csv")
+        i = 0
+        for path in csvPaths:
+            i = i + 1
+            data = self.getBatch(i, self.numberOfEmbeddingPerFile)
+            if len(data) == 0:
+                break
+            yield self.getTestName(path), data
         
+    def getTestName(self, path):
+        print(path)
+        return re.findall(r'.*[\/\\]([a-zA-Z0-9_]+)\.csv$', path)[0]
         
 
     
