@@ -12,6 +12,7 @@ class OneStatsEmbedding(Embedding):
 
     def __init__(self, scaler = None):
 
+        self.type = 'one-stats'
         self.numberOfFeatures = 15 + 6 * 27 + 2 + 15 + 3 * 27
         self.scaler = scaler
         self.stats = Stats()

@@ -123,3 +123,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+estimator/cached/BigFFN-model-train.h5
+estimator/cached/BigFFN-model-test.h5
