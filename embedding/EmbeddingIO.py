@@ -6,18 +6,10 @@ class EmbeddingIO:
 
     def __init__(self):
         """
-        self.sourceSSD = 'C:/earthquake/train.csv'
-        self.sourceHDD = 'F:/myProjects/cmps242/earthquake/data/train.csv'
-        self.destFolderSSD = 'C:/earthquake/'
-        self.destFolderHDD = 'F:/myProjects/cmps242/earthquake/data/'
-        self.sourceSSD = '/home/exx/muktadir/data/train.csv'
-        self.sourceHDD = '/home/exx/muktadir/data/train.csv'
         self.destFolderSSD = '/home/exx/muktadir/data/'
         self.destFolderHDD = '/home/exx/muktadir/data/'
 
         """
-        self.sourceSSD = 'C:/earthquake/train.csv'
-        self.sourceHDD = 'F:/myProjects/cmps242/earthquake/data/train.csv'
         self.destFolderSSD = 'C:/earthquake/'
         self.destFolderHDD = 'F:/myProjects/cmps242/earthquake/data/'
         self.destFolder = self.destFolderSSD
