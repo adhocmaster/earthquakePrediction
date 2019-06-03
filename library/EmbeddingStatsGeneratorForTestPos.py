@@ -20,10 +20,16 @@ class EmbeddingStatsGeneratorForTestPos:
         self.numberOfTestFiles = 2624
         self.numberOfEmbeddingPerFile = math.ceil((150_000 - binsPerEmbedding * 4096) / windowSize)
         self.numEmbeddings = self.numberOfTestFiles * self.numberOfEmbeddingPerFile
+
+        self.addDimToX = False
         if embeddingType == 'one-stats-test':
             self.embedder = OneStatsEmbedding( self.scalers.getScaler('absScaler') ) # positive scaler
         elif embeddingType == 'cnn-stats-test':
+            self.addDimToX = True
             self.embedder = CNNStatsEmbedding( self.scalers.getScaler('absScaler'), binsPerEmbedding=binsPerEmbedding ) # positive scaler
+        
+
+
         pass
     
     def generateEmbeddings(self, skipFiles=0):
@@ -90,7 +96,11 @@ class EmbeddingStatsGeneratorForTestPos:
         for embeddingId in range(start, end):
             try:
                 embedding = self.io.readById(embeddingId)
-                batchList.append(embedding.features)
+                x = embedding.features
+                if self.addDimToX:
+                    batchList.append(x.reshape(-1, self.embedder.numberOfFeatures, 1))
+                else:
+                    batchList.append(x)
             
             except Exception as e:
                 logging.warning(f'encountered exception while reading embedding #{embeddingId}: {e}. Sliently progressing')
