@@ -14,8 +14,9 @@ class CNNStatsEmbedding(Embedding):
         self.scaler = scaler
         self.binsPerEmbedding = binsPerEmbedding
         self.embedding = OneStatsEmbedding(scaler)
-        self.dim = (binsPerEmbedding, self.embedding.numberOfFeatures)
+        self.dim = (binsPerEmbedding, self.embedding.numberOfFeatures, 1)
         super(CNNStatsEmbedding, self).__init__(sourceCardinality = SourceCardinality.MULTI)
+        self.numberOfFeatures = self.embedding.numberOfFeatures
         pass
 
     def fromBins(self, bins: Bin):

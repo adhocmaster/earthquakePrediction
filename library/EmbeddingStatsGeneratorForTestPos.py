@@ -16,9 +16,10 @@ class EmbeddingStatsGeneratorForTestPos:
         self.scalers = Scalers()
         self.windowSize = windowSize
         self.lastEmbeddingId = 0
-        self.numEmbeddings = 34112
-        self.numberOfEmbeddingPerFile = math.ceil((150_000 - binsPerEmbedding * 4096) / windowSize)
         self.binsPerEmbedding = binsPerEmbedding
+        self.numberOfTestFiles = 2624
+        self.numberOfEmbeddingPerFile = math.ceil((150_000 - binsPerEmbedding * 4096) / windowSize)
+        self.numEmbeddings = self.numberOfTestFiles * self.numberOfEmbeddingPerFile
         if embeddingType == 'one-stats-test':
             self.embedder = OneStatsEmbedding( self.scalers.getScaler('absScaler') ) # positive scaler
         elif embeddingType == 'cnn-stats-test':

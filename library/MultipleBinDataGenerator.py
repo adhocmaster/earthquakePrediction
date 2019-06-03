@@ -14,7 +14,7 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
     
     def __init__(self, binType='pos', embedding=MultipleBinEmbeddingType.ONE_STATS, 
                 startBinId = 1, windowSize = 36, stride = 36, 
-                list_IDs = None, numBins = 153584,  batch_size=32, 
+                list_IDs = None, numBins = 153584,  batch_size=16, 
                 n_channels=1, shuffle=False):
     
         self.binType = binType
@@ -38,11 +38,14 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
         if self.stride > self.windowSize:
             logging.warning( f"stride is greater than windowSize" )
 
+        self.addDimToX = False
+
         logging.warning(f"shuffling: {shuffle}")
 
         if embedding == MultipleBinEmbeddingType.ONE_STATS:
             self.dim = (self.embedder.numberOfFeatures)
         elif embedding == MultipleBinEmbeddingType.CNN_STATS:
+            self.addDimToX = True
             self.dim = self.embedder.dim
     
         super(MultipleBinDataGenerator, self).__init__(list_IDs, batch_size, dim=self.dim, shuffle = shuffle)
@@ -99,13 +102,19 @@ class MultipleBinDataGenerator(RegressionDataGenerator):
             for i in range( self.batch_size ):
                 embeddingCache = self.embeddingIO.readById(embeddingId, self.embedder.type)
                 # print(embeddingCache.features.shape)
-                X[i,] = embeddingCache.features
+                if self.addDimToX:
+                    # print('reshaping to', -1, self.embedder.numberOfFeatures, 1)
+                    x = embeddingCache.features
+                    X[i,] = x.reshape(-1, self.embedder.numberOfFeatures, 1)
+                    # print(f'shape of x{x.shape} and shape of reshaped: {X[i,].shape}')
+                else:
+                    X[i,] = embeddingCache.features
                 y[i] = embeddingCache.ttf
                 embeddingId += 1
 
         except Exception as e:
 
-            logging.warning(f"Batch exception{e}")
+            logging.warning(f"Batch exception: {e}")
 
         #print(X.shape)
         return X, y
