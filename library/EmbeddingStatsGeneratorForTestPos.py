@@ -16,7 +16,7 @@ class EmbeddingStatsGeneratorForTestPos:
         self.scalers = Scalers()
         self.windowSize = windowSize
         self.lastEmbeddingId = 0
-        self.numEmbeddings = 0
+        self.numEmbeddings = 34112
         self.numberOfEmbeddingPerFile = math.ceil((150_000 - binsPerEmbedding * 4096) / windowSize)
         self.binsPerEmbedding = binsPerEmbedding
         if embeddingType == 'one-stats-test':
