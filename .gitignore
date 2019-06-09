@@ -123,3 +123,21 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+estimator/cached/BigFFN-model-train.h5
+estimator/cached/BigFFN-model-test.h5
+estimator/cached/2DCNN-MixedKernel-model-train.h5
+estimator/cached/2DCNN-MixedKernel-model-test.h5
+estimator/cached/1DCNN-Encoder-Decoder-Estimator-model-test.h5
+estimator/cached/1DCNN-ColumnKernel4-Global-Average-model-train.h5
+estimator/cached/1DCNN-ColumnKernel-UpSampling-model-train.h5
+estimator/cached/1DCNN-ColumnKernel-UpSampling-model-test.h5
+estimator/cached/1DCNN-ColumnKernel-Tanh-model-test.h5
+estimator/cached/1DCNN-ColumnKernel-Max-Pool-UpSampling2-model-train.h5
+estimator/cached/1DCNN-ColumnKernel-Max-Pool-UpSampling2-model-test.h5
+estimator/cached/1DCNN-ColumnKernel-Avg-Pool-UpSampling-model-train.h5
+estimator/cached/1DCNN-ColumnKernel-Avg-Pool-UpSampling-model-test.h5
+estimator/cached/1DCNN-ColumnKerne-Global-Average-model-train.h5
+estimator/cached/1DCNN-ColumnKerne-Global-Average-model-test.h5
+estimator/cached/1DCNN-ColumnKernel-Tanh-model-train.h5
+estimator/cached/1DCNN-ColumnKernel4-Global-Average-model-test.h5
+estimator/cached/1DCNN-Encoder-Decoder-Estimator-model-train.h5
