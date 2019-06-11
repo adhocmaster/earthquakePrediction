@@ -13,7 +13,7 @@ study earthquake physics. The acoustic_data input signal is used to
 predict the time remaining before the next laboratory earthquake
 (time_to_failure).
 
-![Data Exploration](images/trends.PNG)
+![Data Exploration](images/trends.png)
 
 The data is grouped into bins:
 
