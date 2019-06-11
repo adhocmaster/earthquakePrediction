@@ -22,7 +22,7 @@ The data is grouped into bins:
 # 3. Feature Engineering
 
 ## 3.1 Analysis
-![Statistical Features](images/features1.PNG)
+![Statistical Features](images/features1.png)
 ![Feature Importance](images/feature_importance.png)
 ![Feature Correlation](images/corrplot.png)
 
